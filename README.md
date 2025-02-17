@@ -12,18 +12,15 @@ Ce projet nécessite Python 3 et utilise un environnement virtuel pour la gestio
 
 1. Créez un environnement virtuel :
    ```sh
-   python3 -m venv venv
+   python3 -m venv env
    ```
 
 2. Activez l'environnement virtuel :
-   - **Sur macOS et Linux** :
+   - **Sur Linux** :
      ```sh
-     source venv/bin/activate
+     source env/bin/activate
      ```
-   - **Sur Windows** :
-     ```sh
-     venv\Scripts\activate
-     ```
+
 
 ## Installation des dépendances
 
@@ -34,14 +31,14 @@ pip install -r requirements.txt
 
 ## Désactivation de l'environnement virtuel
 
-Pour quitter l'environnement virtuel, exécutez :
+Pour quitter l'environnement virtuel, on execute :
 ```sh
 deactivate
 ```
 
 ## Vérification des dépendances installées
 
-Vous pouvez vérifier les packages installés avec :
+on pe vérifier les packages installés avec :
 ```sh
 pip list
 ```
@@ -50,7 +47,5 @@ pip list
 
 Pour lancer votre projet après l'installation des dépendances, utilisez la commande spécifique à votre projet.
 
----
 
-Ce fichier peut être modifié en fonction des besoins spécifiques du projet.
 
