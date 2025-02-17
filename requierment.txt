@@ -19,24 +19,24 @@ tensorflow
 torch
 torchvision
 torchaudio
-# xgboost
-# lightgbm
+xgboost
+lightgbm
 
 # Traitement du Langage Naturel (NLP)
-# nltk
-# spacy
-# transformers
+nltk
+spacy
+transformers
 
 # Gestion et stockage des données
-# sqlalchemy
-# pymongo
-# h5py
+sqlalchemy
+pymongo
+h5py
 
 # Cloud et Big Data
-# apache-beam
-# boto3
-# google-cloud
+apache-beam
+boto3
+google-cloud
 
 # Optimisation et automatisation
-# optuna
-# ray
+optuna
+ray

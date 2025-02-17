@@ -2,47 +2,62 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 # 📌 Charger un fichier CSV (ajuster le chemin selon l'emplacement du fichier)
 file_path = "02-14-2018.csv"
 df = pd.read_csv(file_path)
 
-# 🔹 1. Aperçu du dataset
-print("\n📌 Aperçu des premières lignes du dataset :")
-print(df.head())
-
-# 🔹 2. Informations générales sur le dataset
-print("\n📌 Informations générales :")
+print("\n📌 Avant le nettoyage :")
 print(df.info())
 
-# 🔹 3. Nombre de lignes et de colonnes
-print(f"\n📌 Nombre de lignes : {df.shape[0]}  |  Nombre de colonnes : {df.shape[1]}")
+# 🔹 1. Suppression des doublons
+initial_rows = df.shape[0]
+df = df.drop_duplicates()
+print(f"\n✅ Suppression des doublons : {initial_rows - df.shape[0]} lignes supprimées.")
 
-# 🔹 4. Vérification des valeurs manquantes
+# 🔹 2. Gestion des valeurs manquantes
 missing_values = df.isnull().sum()
-missing_values = missing_values[missing_values > 0]  # On garde uniquement les colonnes avec des valeurs nulles
-print("\n📌 Colonnes avec valeurs manquantes :")
-print(missing_values)
+missing_cols = missing_values[missing_values > 0].index.tolist()
 
-# 🔹 5. Distribution des classes (trafic normal vs attaques)
-plt.figure(figsize=(10, 5))
-sns.countplot(y=df['Label'], order=df['Label'].value_counts().index)
-plt.title("📊 Distribution des attaques et du trafic normal")
-plt.show()
+# Suppression des colonnes avec trop de valeurs manquantes (>30%)
+threshold = 0.3 * df.shape[0]
+cols_to_drop = [col for col in missing_cols if missing_values[col] > threshold]
+df = df.drop(columns=cols_to_drop)
+print(f"✅ Colonnes supprimées à cause de valeurs manquantes : {cols_to_drop}")
 
-# 🔹 6. Statistiques descriptives des variables numériques
-print("\n📌 Statistiques descriptives des variables numériques :")
-print(df.describe())
+# Remplacement des valeurs manquantes restantes par la médiane
+for col in missing_cols:
+    if col in df.columns:
+        df[col] = df[col].fillna(df[col].median())
 
-# 🔹 7. Vérification des valeurs dupliquées
-duplicates = df.duplicated().sum()
-print(f"\n📌 Nombre de lignes dupliquées : {duplicates}")
+print("\n✅ Valeurs manquantes traitées.")
 
-# 🔹 8. Matrice de corrélation des 10 premières variables
-plt.figure(figsize=(12, 8))
-corr_matrix = df.select_dtypes(include=[np.number]).corr()
-sns.heatmap(corr_matrix.iloc[:10, :10], annot=True, cmap='coolwarm', fmt=".2f")
-plt.title("🔍 Matrice de Corrélation (10 premières variables)")
-plt.show()
+# 🔹 3. Conversion des types de données (float64 → float32 pour économiser de la mémoire)
+num_cols = df.select_dtypes(include=['float64']).columns
+df[num_cols] = df[num_cols].astype('float32')
 
-print("\n✅ Évaluation des données terminée !")
+print("\n✅ Conversion des types de données effectuée.")
+
+# 🔹 4. Encodage des labels (trafic normal vs attaques)
+if 'Label' in df.columns:
+    encoder = LabelEncoder()
+    df['Label'] = encoder.fit_transform(df['Label'])  # Normal (0) / Attaque (1+ pour plusieurs types)
+
+print("\n✅ Encodage des labels effectué.")
+
+# 🔹 5. Normalisation des valeurs numériques
+scaler = StandardScaler()
+num_cols = df.select_dtypes(include=[np.number]).columns
+df[num_cols] = scaler.fit_transform(df[num_cols])
+
+print("\n✅ Normalisation des valeurs numériques effectuée.")
+
+# 🔹 6. Vérification après nettoyage
+print("\n📌 Après nettoyage :")
+print(df.info())
+print("\n✅ Nettoyage des données terminé !")
+
+# 🔹 7. Sauvegarde du dataset nettoyé
+df.to_csv("CSE-CIC-IDS2018_cleaned.csv", index=False)
+print("\n✅ Dataset nettoyé enregistré sous 'CSE-CIC-IDS2018_cleaned.csv'.")
