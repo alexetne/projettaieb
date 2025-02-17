@@ -81,3 +81,39 @@ print(df.info())
 # 🔹 8. Sauvegarde du dataset nettoyé
 df.to_csv("CSE-CIC-IDS2018_cleaned.csv", index=False)
 print("\n✅ Dataset nettoyé enregistré sous 'CSE-CIC-IDS2018_cleaned.csv'.")
+
+# -----------------------------------
+# 🔹 9. ANALYSE STATISTIQUE DESCRIPTIVE
+# -----------------------------------
+
+print("\n📊 ANALYSE STATISTIQUE DESCRIPTIVE")
+
+# 🔹 Statistiques générales des variables numériques
+print("\n📌 Statistiques générales des variables numériques :")
+print(df.describe())
+
+# 🔹 Distribution des classes (trafic normal vs attaques)
+plt.figure(figsize=(8, 4))
+sns.countplot(y=df['Label'], order=df['Label'].value_counts().index, palette="coolwarm")
+plt.title("📊 Distribution des classes (trafic normal vs attaques)")
+plt.xlabel("Nombre d'échantillons")
+plt.ylabel("Classes")
+plt.show()
+
+# 🔹 Histogramme des variables clés
+key_features = ['Flow Duration', 'Total Fwd Packets', 'Total Backward Packets', 'Fwd Packet Length Max']
+key_features = [col for col in key_features if col in df.columns]  # Vérification que les colonnes existent
+
+if key_features:
+    df[key_features].hist(figsize=(12, 8), bins=50, color='skyblue')
+    plt.suptitle("📊 Histogrammes des variables clés")
+    plt.show()
+
+# 🔹 Matrice de corrélation des 10 premières variables
+plt.figure(figsize=(12, 8))
+corr_matrix = df[num_cols].corr()
+sns.heatmap(corr_matrix.iloc[:10, :10], annot=True, cmap='coolwarm', fmt=".2f")
+plt.title("🔍 Matrice de Corrélation (10 premières variables)")
+plt.show()
+
+print("\n✅ Analyse statistique descriptive terminée !")
