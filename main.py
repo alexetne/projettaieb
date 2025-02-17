@@ -117,3 +117,60 @@ plt.title("🔍 Matrice de Corrélation (10 premières variables)")
 plt.show()
 
 print("\n✅ Analyse statistique descriptive terminée !")
+
+
+# 📌 Charger le dataset nettoyé
+file_path = "CSE-CIC-IDS2018_cleaned.csv"
+df = pd.read_csv(file_path)
+
+print("\n📊 ANALYSE VISUELLE DES DONNÉES")
+
+# 🔹 Vérifier si les données sont déjà normalisées
+if df.select_dtypes(include=[np.number]).apply(lambda x: x.mean()).abs().max() < 1:
+    print("\n⚠️ Attention : Les données semblent déjà normalisées (mean ≈ 0, std ≈ 1). Vérification requise avant toute normalisation.")
+    
+# 🔹 1. Distribution des classes (trafic normal vs attaques)
+plt.figure(figsize=(8, 4))
+sns.countplot(y=df['Label'], order=df['Label'].value_counts().index, hue=df['Label'], palette="coolwarm", legend=False)
+plt.title("📊 Distribution des classes (trafic normal vs attaques)")
+plt.xlabel("Nombre d'échantillons")
+plt.ylabel("Classes")
+plt.savefig("distribution_classes.png")  # Sauvegarde l'image
+plt.close()
+
+# 🔹 2. Histogrammes des principales caractéristiques
+key_features = ['Flow Duration', 'Total Fwd Packets', 'Total Backward Packets', 'Fwd Packet Length Max']
+key_features = [col for col in key_features if col in df.columns]  # Vérification que les colonnes existent
+
+if key_features:
+    df[key_features].hist(figsize=(12, 8), bins=50, color='skyblue')
+    plt.suptitle("📊 Histogrammes des principales variables")
+    plt.savefig("histogrammes_variables.png")
+    plt.close()
+
+# 🔹 3. Boxplots pour identifier les valeurs aberrantes
+plt.figure(figsize=(12, 6))
+sns.boxplot(data=df[key_features], palette="coolwarm")
+plt.title("📊 Boxplots des principales variables pour détecter les outliers")
+plt.xticks(rotation=45)
+plt.savefig("boxplots_outliers.png")
+plt.close()
+
+# 🔹 4. Matrice de corrélation des 10 premières variables
+plt.figure(figsize=(12, 8))
+corr_matrix = df.select_dtypes(include=[np.number]).corr()
+sns.heatmap(corr_matrix.iloc[:10, :10], annot=True, cmap='coolwarm', fmt=".2f")
+plt.title("🔍 Matrice de Corrélation (10 premières variables)")
+plt.savefig("matrice_correlation.png")
+plt.close()
+
+# 🔹 5. Pairplot des principales features (échantillonnage si trop grand)
+sample_df = df.sample(n=5000, random_state=42) if df.shape[0] > 5000 else df
+
+if len(key_features) > 1:
+    sns.pairplot(sample_df[key_features + ['Label']], hue='Label', palette="coolwarm", diag_kind="kde")
+    plt.suptitle("📊 Pairplot des principales variables en fonction des classes", y=1.02)
+    plt.savefig("pairplot_variables.png")
+    plt.close()
+
+print("\n✅ Visualisation des données terminée ! Toutes les figures sont enregistrées.")
