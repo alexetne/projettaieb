@@ -1,0 +1,42 @@
+# Manipulation et traitement des données
+pandas
+numpy
+# dask
+# pyspark
+
+# Prétraitement et nettoyage des données
+scikit-learn
+# imbalanced-learn
+opencv-python
+
+# Visualisation des données
+matplotlib
+seaborn
+plotly
+
+# Machine Learning / Deep Learning
+tensorflow
+torch
+torchvision
+torchaudio
+# xgboost
+# lightgbm
+
+# Traitement du Langage Naturel (NLP)
+# nltk
+# spacy
+# transformers
+
+# Gestion et stockage des données
+# sqlalchemy
+# pymongo
+# h5py
+
+# Cloud et Big Data
+# apache-beam
+# boto3
+# google-cloud
+
+# Optimisation et automatisation
+# optuna
+# ray
