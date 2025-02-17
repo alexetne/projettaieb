@@ -76,7 +76,4 @@ Un fichier nettoyé est ensuite généré sous le nom **`CSE-CIC-IDS2018_cleaned
 
 Pour lancer votre projet après l'installation des dépendances et la préparation des données, utilisez la commande spécifique à votre projet.
 
----
-
-Ce fichier peut être modifié en fonction des besoins spécifiques du projet.
 

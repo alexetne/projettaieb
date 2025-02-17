@@ -33,31 +33,51 @@ for col in missing_cols:
 
 print("\n✅ Valeurs manquantes traitées.")
 
-# 🔹 3. Conversion des types de données (float64 → float32 pour économiser de la mémoire)
-num_cols = df.select_dtypes(include=['float64']).columns
+# 🔹 3. Suppression des valeurs infinies et aberrantes
+num_cols = df.select_dtypes(include=['float64', 'float32', 'int64']).columns
+
+# Remplacement des valeurs infinies par la valeur maximale de la colonne
+for col in num_cols:
+    df[col] = df[col].replace([np.inf, -np.inf], np.nan)  # Transformer inf en NaN
+    df[col] = df[col].fillna(df[col].median())  # Remplacer NaN par la médiane
+
+# Suppression des valeurs aberrantes (IQR method)
+Q1 = df[num_cols].quantile(0.25)
+Q3 = df[num_cols].quantile(0.75)
+IQR = Q3 - Q1
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+df = df[~((df[num_cols] < lower_bound) | (df[num_cols] > upper_bound)).any(axis=1)]
+
+print("\n✅ Suppression des valeurs infinies et des outliers effectuée.")
+
+# 🔹 4. Conversion des types de données (float64 → float32 pour économiser de la mémoire)
 df[num_cols] = df[num_cols].astype('float32')
 
 print("\n✅ Conversion des types de données effectuée.")
 
-# 🔹 4. Encodage des labels (trafic normal vs attaques)
+# 🔹 5. Encodage des labels (trafic normal vs attaques)
 if 'Label' in df.columns:
     encoder = LabelEncoder()
     df['Label'] = encoder.fit_transform(df['Label'])  # Normal (0) / Attaque (1+ pour plusieurs types)
 
 print("\n✅ Encodage des labels effectué.")
 
-# 🔹 5. Normalisation des valeurs numériques
+# 🔹 6. Normalisation des valeurs numériques
 scaler = StandardScaler()
-num_cols = df.select_dtypes(include=[np.number]).columns
-df[num_cols] = scaler.fit_transform(df[num_cols])
 
-print("\n✅ Normalisation des valeurs numériques effectuée.")
+# Vérification que les valeurs sont finies avant normalisation
+if np.isfinite(df[num_cols]).all().all():
+    df[num_cols] = scaler.fit_transform(df[num_cols])
+    print("\n✅ Normalisation des valeurs numériques effectuée.")
+else:
+    print("\n⚠️ Attention : Certaines valeurs sont encore infinies ou NaN après nettoyage.")
 
-# 🔹 6. Vérification après nettoyage
+# 🔹 7. Vérification après nettoyage
 print("\n📌 Après nettoyage :")
 print(df.info())
-print("\n✅ Nettoyage des données terminé !")
 
-# 🔹 7. Sauvegarde du dataset nettoyé
+# 🔹 8. Sauvegarde du dataset nettoyé
 df.to_csv("CSE-CIC-IDS2018_cleaned.csv", index=False)
 print("\n✅ Dataset nettoyé enregistré sous 'CSE-CIC-IDS2018_cleaned.csv'.")
