@@ -5,6 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
+02-14-2018.csv
 
 # Distribution / packaging
 .Python
